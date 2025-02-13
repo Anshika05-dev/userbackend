@@ -2,19 +2,7 @@ const authmodel = require('../model/authmodel')
 const dontenv=require("dotenv").config();
 const jwt=require('jsonwebtoken')
 const db =require ('../config/database')
-const multer =require('multer')
 
-// const storage=multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         return cb(null,'.../uploads')
-//     },
-//     filename: function (req, file, cb) {
-//         return cb(null,`${Date.now()}-${file.originalname}`)
-//     }
-// });
-
-// const upload = multer({ storage })
-// return upload;
 
 const authcontroller = {
     signup: (req, res) => {
@@ -73,21 +61,29 @@ const authcontroller = {
             }
         )
     },
-    // upload:(req,res) =>{
-    //     console.log("upload work");
-    //     const storage=multer.diskStorage({
-    //         destination: function (req, file, cb) {
-    //             return cb(null,'.../uploads')
-    //         },
-    //         filename: function (req, file, cb) {
-    //             return cb(null,`${Date.now()}-${file.originalname}`)
-    //         }
-    //     });
-    //     console.log(req.file);
-    //     res.send("Uploaded successfully")
-    //     const upload = multer({ storage })
-    //     return upload;
-        
-    // }
+    upload:(req,res) =>{
+        if(!req.file){
+            return res.send("No file uploaded")
+        }
+        const body={
+            email: req.body.email,
+            profile_image: req.file.filename
+        };
+        authmodel.upload(body,(err,result)=>{
+            if(err){
+                res.send("Error")
+            }
+            if(result.affectedRows===0){
+                res.json("user not found")
+            }
+            return res.json({
+                "message":"upoaded",
+                "data":{
+                    "email": body.email,
+                    "profile_image": body.profile_image
+                }
+            })
+        })
+    }
 }
 module.exports = authcontroller;

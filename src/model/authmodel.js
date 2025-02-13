@@ -1,4 +1,5 @@
-const db = require('../config/database')
+const db = require('../config/database');
+const { upload } = require('../controllers/authControllers');
 const model = {
     insert: (name, email, password, num, callback) => {
         db.query(
@@ -34,6 +35,18 @@ const model = {
                 else{
                     return callback(null,entry);
                 }
+            }
+        )
+    },
+    upload:(data,callback)=>{
+        db.query(
+            'UPDATE users SET profile_image=? WHERE email=?',
+            [data.profile_image,data.email],
+            (err,result)=>{
+                if(err){
+                    return callback(err);
+                }
+                return callback(null,result);
             }
         )
     }
